@@ -687,7 +687,7 @@ export default function Home() {
 
         {/* ─── Multi-select Forward Bar ─── */}
         {selectMode && (
-          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #e0e0e0', padding: '10px 16px', paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 15 }}>
+          <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 412, background: '#fff', borderTop: '1px solid #e0e0e0', padding: '10px 16px', paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 15 }}>
             <button onClick={cancelSelectMode} style={{ background: 'transparent', border: 'none', color: '#667781', fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
             <span style={{ fontSize: 15, color: '#111b21', fontWeight: 500 }}>{selectedForwards.length} Seleccionado{selectedForwards.length !== 1 ? 's' : ''}</span>
             <button onClick={openForwardPicker} disabled={selectedForwards.length === 0}
