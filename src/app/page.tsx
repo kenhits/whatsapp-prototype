@@ -419,7 +419,7 @@ export default function Home() {
 
   return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111b21' }}>
-      <div style={{ width: '100%', maxWidth: 412, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: '#ece5dd' }}>
+      <div className="phone-frame" style={{ width: '100%', maxWidth: 412, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: '#ece5dd', borderRadius: '2.2rem', border: '1px solid #333' }}>
 
         {/* ─── Header ─── */}
         <header style={{ background: '#075e54', color: '#fff', padding: '8px 8px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, zIndex: 10 }}>
@@ -616,7 +616,7 @@ export default function Home() {
 
         {/* ─── Toast ─── */}
         {toast && (
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-[#323739] text-white px-4 py-2 rounded-lg text-sm shadow-lg z-30 whitespace-nowrap">
+          <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#323739', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: 14, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 30, whiteSpace: 'nowrap' }}>
             {toast}
           </div>
         )}
@@ -749,7 +749,7 @@ export default function Home() {
               </div>
 
               {/* Alphabet index strip */}
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "4px 6px", flexShrink: 0, backgroundColor: "transparent" }}>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "4px 8px 4px 4px", flexShrink: 0, backgroundColor: "transparent" }}>
                 {alphabet.map(letter => (
                   <div key={letter} style={{ fontSize: 10, fontWeight: 600, color: "#007AFF", lineHeight: "14px", cursor: "pointer" }}>{letter}</div>
                 ))}
@@ -805,21 +805,21 @@ export default function Home() {
 
         {/* ─── Contact Card Details ─── */}
         {showContactCardDetails && (
-          <div className="absolute inset-0 bg-white z-20 flex flex-col">
-            <div className="bg-[#075e54] text-white px-4 py-3 flex items-center justify-between shrink-0">
-              <button onClick={() => setShowContactCardDetails(null)} className="text-white/80 hover:text-white text-sm">Close</button>
-              <span className="font-semibold text-[17px]">Shared contacts</span>
-              <span className="w-10" />
+          <div style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+            <div style={{ backgroundColor: '#075e54', color: '#fff', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <button onClick={() => setShowContactCardDetails(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontSize: 14, cursor: 'pointer', padding: 0 }}>Close</button>
+              <span style={{ fontWeight: 600, fontSize: 17 }}>Shared contacts</span>
+              <span style={{ width: 40 }} />
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
               {showContactCardDetails.map((contact, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 bg-[#f7f8fa] rounded-lg">
-                  <div className="w-11 h-11 rounded-full bg-[#00a884] flex items-center justify-center shrink-0">
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, backgroundColor: '#f7f8fa', borderRadius: 8, marginBottom: 16 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', backgroundColor: '#00a884', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <ContactIcon />
                   </div>
                   <div>
-                    <p className="text-[15px] text-[#111b21] font-medium">{contact.name}</p>
-                    <p className="text-[13px] text-[#667781]">+{contact.phone}</p>
+                    <p style={{ fontSize: 15, color: '#111b21', fontWeight: 500, margin: 0 }}>{contact.name}</p>
+                    <p style={{ fontSize: 13, color: '#667781', margin: '2px 0 0 0' }}>+{contact.phone}</p>
                   </div>
                 </div>
               ))}
@@ -958,39 +958,39 @@ export default function Home() {
 
         {/* ─── Settings Modal ─── */}
         {showSettings && (
-          <div className="absolute inset-0 bg-black/50 z-20 flex items-end sm:items-center justify-center">
-            <div className="bg-white w-full sm:w-[90%] sm:max-w-md sm:rounded-xl rounded-t-xl max-h-[85vh] flex flex-col shadow-xl">
-              <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
-                <h2 className="text-[17px] font-semibold text-[#111b21]">Configuración</h2>
-                <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-gray-100 rounded-full"><CloseIcon /></button>
+          <div style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div style={{ backgroundColor: '#fff', width: '100%', borderRadius: '12px 12px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 -4px 20px rgba(0,0,0,0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #e5e5ea', flexShrink: 0 }}>
+                <h2 style={{ fontSize: 17, fontWeight: 600, color: '#111b21', margin: 0 }}>Configuracion</h2>
+                <button onClick={() => setShowSettings(false)} style={{ padding: 4, background: 'none', border: 'none', cursor: 'pointer', borderRadius: '50%' }}><CloseIcon /></button>
               </div>
-              <div className="p-4 flex-1 overflow-y-auto space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#54656f] mb-1.5">Nombre del bot</label>
+              <div style={{ padding: 16, flex: 1, overflowY: 'auto' }}>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#54656f', marginBottom: 6 }}>Nombre del bot</label>
                   <input type="text" value={tempBotName} onChange={(e) => setTempBotName(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg text-sm text-[#111b21] focus:outline-none focus:ring-2 focus:ring-[#00a884]" />
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14, color: '#111b21', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#54656f] mb-1.5">Modelo de IA</label>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#54656f', marginBottom: 6 }}>Modelo de IA</label>
                   <select value={tempModel} onChange={(e) => setTempModel(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg text-sm text-[#111b21] focus:outline-none focus:ring-2 focus:ring-[#00a884] bg-white">
-                    <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (rápido)</option>
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14, color: '#111b21', outline: 'none', backgroundColor: '#fff', boxSizing: 'border-box' }}>
+                    <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (rapido)</option>
                     <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (recomendado)</option>
-                    <option value="claude-opus-4-20250514">Claude Opus 4 (más capaz)</option>
+                    <option value="claude-opus-4-20250514">Claude Opus 4 (mas capaz)</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#54656f] mb-1.5">System Prompt</label>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 500, color: '#54656f', marginBottom: 6 }}>System Prompt</label>
                   <textarea value={tempPrompt} onChange={(e) => setTempPrompt(e.target.value)} rows={12}
-                    className="w-full p-3 border rounded-lg text-[13px] text-[#111b21] resize-none focus:outline-none focus:ring-2 focus:ring-[#00a884] font-mono leading-relaxed"
-                    placeholder="Escribe el system prompt aquí..." />
+                    style={{ width: '100%', padding: 12, border: '1px solid #d1d5db', borderRadius: 8, fontSize: 13, color: '#111b21', resize: 'none', outline: 'none', fontFamily: 'monospace', lineHeight: '1.6', boxSizing: 'border-box' }}
+                    placeholder="Escribe el system prompt aqui..." />
                 </div>
               </div>
-              <div className="flex gap-2 p-4 border-t shrink-0">
-                <button onClick={clearChat} className="px-4 py-2 rounded-lg text-red-600 text-sm font-medium hover:bg-red-50 transition-colors">Limpiar chat</button>
-                <div className="flex-1" />
-                <button onClick={() => setShowSettings(false)} className="px-4 py-2 rounded-lg border text-[#54656f] text-sm font-medium hover:bg-gray-50 transition-colors">Cancelar</button>
-                <button onClick={saveSettings} className="px-5 py-2 rounded-lg bg-[#00a884] text-white text-sm font-medium hover:bg-[#008f72] transition-colors">Guardar</button>
+              <div style={{ display: 'flex', gap: 8, padding: 16, borderTop: '1px solid #e5e5ea', flexShrink: 0 }}>
+                <button onClick={clearChat} style={{ padding: '8px 16px', borderRadius: 8, background: 'none', border: 'none', color: '#dc2626', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>Limpiar chat</button>
+                <div style={{ flex: 1 }} />
+                <button onClick={() => setShowSettings(false)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #d1d5db', background: 'none', color: '#54656f', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>Cancelar</button>
+                <button onClick={saveSettings} style={{ padding: '8px 20px', borderRadius: 8, backgroundColor: '#00a884', border: 'none', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>Guardar</button>
               </div>
             </div>
           </div>
