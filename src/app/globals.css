@@ -7,7 +7,11 @@
   -webkit-font-smoothing: antialiased;
 }
 
-html, body {
+html {
+  height: 100%;
+}
+
+body {
   height: 100%;
   overflow: hidden;
   font-family: 'Segoe UI', Helvetica, Arial, 'Lucida Grande', sans-serif;
@@ -92,5 +96,6 @@ html, body {
     border-radius: 0 !important;
     border: none !important;
     max-width: 100% !important;
+    overflow: visible !important;
   }
 }

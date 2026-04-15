@@ -9,6 +9,7 @@ interface Message {
   content: string;
   timestamp: string;
   forwardContent?: string;
+  forwardContents?: string[];
   contactCard?: { name: string; phone: string }[];
 }
 
@@ -93,23 +94,50 @@ Escríbeme el número de tu opción o dime cómo prefieres.
 IMPORTANTE: Esta pregunta DEBE hacerse ANTES de generar cualquier link o pedir contactos.
 
 PASO 3A - Link de cobro:
-Si elige "Generar link de cobro", genera el link usando este formato EXACTO:
+Si elige "Generar link de cobro":
 
-Tu cobro ha sido generado exitosamente! 📝
+COBRO SIMPLE (1 persona):
+Responde con un mensaje corto + UN bloque reenviable:
+
+Listo! Aquí tienes tu link de cobro 📝
 
 REENVIO_INICIO
 💰 Cobro Pagos CIX BCP
+Nombre: [nombre de la persona o dejar vacío si no se proporcionó]
 Monto: S/ [monto]
 Concepto: [concepto o "Cobro general"]
 Link de pago: https://pagoscix.pe/cobro/[6 caracteres aleatorios]
 Válido por 24 horas
 REENVIO_FIN
 
-Puedes copiar el link o reenviar este mensaje a tu contacto.
+IMPORTANTE: SIEMPRE incluye la línea "Nombre:" en el bloque reenviable. Si el usuario no proporcionó un nombre, escribe "Nombre: " (vacío).
 
-¿Qué deseas hacer ahora?
-1. Volver al menú
-2. Registrar otro cobro
+COBROS MÚLTIPLES (varias personas):
+Cuando el cobro involucra a varias personas, genera UN bloque REENVIO_INICIO/REENVIO_FIN SEPARADO para cada persona. Cada bloque genera una tarjeta reenviable independiente.
+
+Ejemplo para 2 personas:
+
+Listos tus cobros! 📝 Reenvía cada mensaje al contacto correspondiente.
+
+REENVIO_INICIO
+💰 Cobro Pagos CIX BCP
+Nombre: [nombre persona 1]
+Monto: S/ [monto 1]
+Concepto: [concepto]
+Link de pago: https://pagoscix.pe/cobro/[6 caracteres aleatorios]
+Válido por 24 horas
+REENVIO_FIN
+
+REENVIO_INICIO
+💰 Cobro Pagos CIX BCP
+Nombre: [nombre persona 2]
+Monto: S/ [monto 2]
+Concepto: [concepto]
+Link de pago: https://pagoscix.pe/cobro/[6 caracteres aleatorios DIFERENTES]
+Válido por 24 horas
+REENVIO_FIN
+
+REGLA: Cada persona SIEMPRE tiene su propio bloque REENVIO_INICIO/REENVIO_FIN con un link único. NUNCA juntes múltiples cobros en un solo bloque. El mensaje introductorio debe ser CORTO (1 línea máximo).
 
 PASO 3B - Adjuntar contactos:
 Si elige "Adjuntar contactos", hay DOS escenarios:
@@ -201,23 +229,28 @@ function getTime() {
 function parseResponse(text: string): {
   content: string;
   forwardContent?: string;
+  forwardContents?: string[];
 } {
   const lines = text.split("\n");
   const contentLines: string[] = [];
-  const forwardLines: string[] = [];
+  const allForwardBlocks: string[][] = [];
+  let currentBlock: string[] = [];
   let inForward = false;
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed === "REENVIO_INICIO") { inForward = true; continue; }
-    if (trimmed === "REENVIO_FIN") { inForward = false; continue; }
-    if (inForward) { forwardLines.push(line); continue; }
+    if (trimmed === "REENVIO_INICIO") { inForward = true; currentBlock = []; continue; }
+    if (trimmed === "REENVIO_FIN") { inForward = false; allForwardBlocks.push(currentBlock); continue; }
+    if (inForward) { currentBlock.push(line); continue; }
     contentLines.push(line);
   }
 
+  const forwardContents = allForwardBlocks.map(b => b.join("\n").trim()).filter(Boolean);
+
   return {
     content: contentLines.join("\n").trim(),
-    forwardContent: forwardLines.length > 0 ? forwardLines.join("\n").trim() : undefined,
+    forwardContent: forwardContents.length === 1 ? forwardContents[0] : undefined,
+    forwardContents: forwardContents.length > 1 ? forwardContents : undefined,
   };
 }
 
@@ -283,6 +316,10 @@ export default function Home() {
   const [selectedForwardContact, setSelectedForwardContact] = useState<Contact | null>(null);
   const [forwardMessage, setForwardMessage] = useState("");
 
+  // Multi-select forward
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedForwards, setSelectedForwards] = useState<string[]>([]);
+
   // Attachment menu
   const [showAttachMenu, setShowAttachMenu] = useState(false);
 
@@ -341,11 +378,11 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error del servidor");
 
-      const { content, forwardContent } = parseResponse(data.content);
+      const { content, forwardContent, forwardContents } = parseResponse(data.content);
       await new Promise((r) => setTimeout(r, 800 + Math.random() * 700));
 
       setMessages((prev) => [...prev, {
-        id: crypto.randomUUID(), role: "assistant", content, timestamp: getTime(), forwardContent,
+        id: crypto.randomUUID(), role: "assistant", content, timestamp: getTime(), forwardContent, forwardContents,
       }]);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Error desconocido";
@@ -367,14 +404,29 @@ export default function Home() {
   function clearChat() { setMessages([makeWelcomeMessage()]); setError(null); setShowSettings(false); }
 
   /* ─── Forward Flow ─── */
-  function handleForward(content: string) { setForwardingContent(content); setContactSearch(""); setSelectedForwardContact(null); setForwardMessage(""); setShowForwardPicker(true); }
+  function handleForward(content: string) {
+    // Enter select mode: auto-select the clicked card and let user select more
+    setSelectMode(true);
+    setSelectedForwards((prev) => prev.includes(content) ? prev : [...prev, content]);
+  }
+  function toggleForwardSelect(content: string) {
+    setSelectedForwards((prev) => prev.includes(content) ? prev.filter(c => c !== content) : [...prev, content]);
+  }
+  function openForwardPicker() {
+    const combined = selectedForwards.join("\n\n---\n\n");
+    setForwardingContent(combined);
+    setContactSearch(""); setSelectedForwardContact(null); setForwardMessage("");
+    setShowForwardPicker(true);
+    setSelectMode(false); setSelectedForwards([]);
+  }
+  function cancelSelectMode() { setSelectMode(false); setSelectedForwards([]); }
   function handleSelectForwardContact(contact: Contact) {
     setSelectedForwardContact((prev) => prev?.phone === contact.phone ? null : contact);
   }
   function handleForwardSend() {
     if (!selectedForwardContact) return;
     setShowForwardPicker(false); setForwardingContent(null); setSelectedForwardContact(null); setForwardMessage("");
-    setToast(`Reenviado a ${selectedForwardContact.name} ✓`);
+    setToast(`Reenviado a ${selectedForwardContact.name} (${selectedForwards.length || 1} mensaje${(selectedForwards.length || 1) > 1 ? 's' : ''}) ✓`);
   }
 
   /* ─── Contact Sharing Flow ─── */
@@ -418,7 +470,7 @@ export default function Home() {
   );
 
   return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111b21' }}>
+    <div style={{ height: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111b21' }}>
       <div className="phone-frame" style={{ width: '100%', maxWidth: 412, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: '#ece5dd', borderRadius: '2.2rem', border: '1px solid #333' }}>
 
         {/* ─── Header ─── */}
@@ -503,26 +555,37 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Forwardable card */}
-                {msg.forwardContent && (
-                  <div style={{ display: 'flex', justifyContent: 'flex-start', paddingRight: 48, marginTop: 2 }}>
-                    <div className="bubble-in" style={{ maxWidth: '100%', overflow: 'hidden' }}>
-                      <div style={{ padding: '5px 9px 0', display: 'flex', alignItems: 'center', gap: 4, color: '#667781' }}>
-                        <ForwardIcon size={11} />
-                        <span style={{ fontSize: 11, fontStyle: 'italic' }}>Mensaje reenviable</span>
+                {/* Forwardable cards (single or multiple) */}
+                {[...(msg.forwardContent ? [msg.forwardContent] : []), ...(msg.forwardContents || [])].map((fc, fi) => {
+                  const isSelected = selectedForwards.includes(fc);
+                  return (
+                    <div key={fi} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingRight: selectMode ? 12 : 48, marginTop: fi === 0 ? 2 : 4, gap: 8 }}>
+                      {/* Checkbox in select mode */}
+                      {selectMode && (
+                        <button onClick={() => toggleForwardSelect(fc)} style={{ marginTop: 10, flexShrink: 0, width: 26, height: 26, borderRadius: '50%', border: isSelected ? 'none' : '2px solid #ccc', background: isSelected ? '#00a884' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}>
+                          {isSelected && <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>}
+                        </button>
+                      )}
+                      <div className="bubble-in" style={{ maxWidth: '100%', overflow: 'hidden', flex: 1 }}>
+                        <div style={{ padding: '5px 9px 0', display: 'flex', alignItems: 'center', gap: 4, color: '#667781' }}>
+                          <ForwardIcon size={11} />
+                          <span style={{ fontSize: 11, fontStyle: 'italic' }}>Mensaje reenviable</span>
+                        </div>
+                        <div style={{ padding: '5px 9px 7px' }}>
+                          <p style={{ fontSize: 14, color: '#111b21', lineHeight: '19px', whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}
+                            dangerouslySetInnerHTML={{ __html: fc.replace(/(https?:\/\/[^\s]+)/g, '<span style="color:#027eb5;text-decoration:underline;cursor:pointer">$1</span>') }} />
+                        </div>
+                        {!selectMode && (
+                          <button onClick={() => handleForward(fc)}
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 0', borderTop: '1px solid #e9edef', color: '#00a884', background: 'transparent', border: 'none', borderTop: '1px solid #e9edef', cursor: 'pointer', fontSize: 13.5 }}>
+                            <ForwardIcon size={15} />
+                            <span>Reenviar mensaje</span>
+                          </button>
+                        )}
                       </div>
-                      <div style={{ padding: '5px 9px 7px' }}>
-                        <p style={{ fontSize: 14, color: '#111b21', lineHeight: '19px', whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}
-                          dangerouslySetInnerHTML={{ __html: msg.forwardContent!.replace(/(https?:\/\/[^\s]+)/g, '<span style="color:#027eb5;text-decoration:underline;cursor:pointer">$1</span>') }} />
-                      </div>
-                      <button onClick={() => handleForward(msg.forwardContent!)}
-                        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 0', borderTop: '1px solid #e9edef', color: '#00a884', background: 'transparent', border: 'none', borderTop: '1px solid #e9edef', cursor: 'pointer', fontSize: 13.5 }}>
-                        <ForwardIcon size={15} />
-                        <span>Reenviar mensaje</span>
-                      </button>
                     </div>
-                  </div>
-                )}
+                  );
+                })}
               </div>
             );
           })}
@@ -565,7 +628,7 @@ export default function Home() {
         )}
 
         {/* ─── Input Area ─── */}
-        <form onSubmit={handleSubmit} style={{ background: '#f0f0f0', padding: '6px 10px', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <form onSubmit={handleSubmit} style={{ background: '#f0f0f0', padding: 'calc(6px) 10px calc(6px + env(safe-area-inset-bottom, 0px))', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
           {/* + Button */}
           <button type="button" onClick={() => setShowAttachMenu(!showAttachMenu)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -614,9 +677,21 @@ export default function Home() {
           )}
         </form>
 
+        {/* ─── Multi-select Forward Bar ─── */}
+        {selectMode && (
+          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #e0e0e0', padding: '10px 16px', paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 15 }}>
+            <button onClick={cancelSelectMode} style={{ background: 'transparent', border: 'none', color: '#667781', fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
+            <span style={{ fontSize: 15, color: '#111b21', fontWeight: 500 }}>{selectedForwards.length} Seleccionado{selectedForwards.length !== 1 ? 's' : ''}</span>
+            <button onClick={openForwardPicker} disabled={selectedForwards.length === 0}
+              style={{ background: 'transparent', border: 'none', fontSize: 14, cursor: selectedForwards.length > 0 ? 'pointer' : 'default', padding: 8, display: 'flex', alignItems: 'center', gap: 6, color: selectedForwards.length > 0 ? '#00a884' : '#ccc' }}>
+              <ForwardIcon size={18} />
+            </button>
+          </div>
+        )}
+
         {/* ─── Toast ─── */}
         {toast && (
-          <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#323739', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: 14, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 30, whiteSpace: 'nowrap' }}>
+          <div style={{ position: 'absolute', bottom: 80, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#323739', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: 14, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 30, maxWidth: 'calc(100% - 32px)', textAlign: 'center' }}>
             {toast}
           </div>
         )}
@@ -653,7 +728,7 @@ export default function Home() {
           };
 
           return (
-          <div style={{ position: "absolute", inset: 0, zIndex: 20, backgroundColor: "#f2f2f7", display: "flex", flexDirection: "column" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 20, backgroundColor: "#f2f2f7", display: "flex", flexDirection: "column" }}>
             {/* Header */}
             <div style={{ backgroundColor: "#f2f2f7", paddingTop: 14, flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "0 16px 10px 16px" }}>
@@ -766,7 +841,7 @@ export default function Home() {
             return p.replace(/(\+\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4');
           }
           return (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7' }}>
             {/* Header */}
             <div style={{ backgroundColor: '#f2f2f7', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <button onClick={() => { setShowContactConfirm(false); setShowContactPicker(true); }} style={{ background: 'none', border: 'none', color: '#007AFF', fontSize: 17, cursor: 'pointer', padding: 0 }}>Cancel</button>
@@ -805,7 +880,7 @@ export default function Home() {
 
         {/* ─── Contact Card Details ─── */}
         {showContactCardDetails && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
             <div style={{ backgroundColor: '#075e54', color: '#fff', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <button onClick={() => setShowContactCardDetails(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontSize: 14, cursor: 'pointer', padding: 0 }}>Close</button>
               <span style={{ fontWeight: 600, fontSize: 17 }}>Shared contacts</span>
@@ -829,7 +904,7 @@ export default function Home() {
 
         {/* ─── Forward Picker ─── */}
         {showForwardPicker && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7' }}>
             {/* Header */}
             <div style={{ backgroundColor: '#f2f2f7', paddingTop: 12, paddingBottom: 0, flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 10px 16px' }}>
@@ -919,7 +994,7 @@ export default function Home() {
             </div>
 
             {/* Bottom bar */}
-            <div style={{ backgroundColor: '#fff', borderTop: '1px solid #e5e5ea', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <div style={{ backgroundColor: '#fff', borderTop: '1px solid #e5e5ea', padding: '8px 12px', paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               {selectedForwardContact ? (
                 <span style={{ fontSize: 14, color: '#000', fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0 }}>{selectedForwardContact.name}</span>
               ) : (
@@ -958,7 +1033,7 @@ export default function Home() {
 
         {/* ─── Settings Modal ─── */}
         {showSettings && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
             <div style={{ backgroundColor: '#fff', width: '100%', borderRadius: '12px 12px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 -4px 20px rgba(0,0,0,0.15)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #e5e5ea', flexShrink: 0 }}>
                 <h2 style={{ fontSize: 17, fontWeight: 600, color: '#111b21', margin: 0 }}>Configuracion</h2>
