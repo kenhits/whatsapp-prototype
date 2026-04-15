@@ -313,7 +313,7 @@ export default function Home() {
   // Forward flow
   const [showForwardPicker, setShowForwardPicker] = useState(false);
   const [forwardingContent, setForwardingContent] = useState<string | null>(null);
-  const [selectedForwardContact, setSelectedForwardContact] = useState<Contact | null>(null);
+  const [selectedForwardContacts, setSelectedForwardContacts] = useState<Contact[]>([]);
   const [forwardMessage, setForwardMessage] = useState("");
 
   // Multi-select forward
@@ -415,18 +415,26 @@ export default function Home() {
   function openForwardPicker() {
     const combined = selectedForwards.join("\n\n---\n\n");
     setForwardingContent(combined);
-    setContactSearch(""); setSelectedForwardContact(null); setForwardMessage("");
+    setContactSearch(""); setSelectedForwardContacts([]); setForwardMessage("");
     setShowForwardPicker(true);
     setSelectMode(false); setSelectedForwards([]);
   }
   function cancelSelectMode() { setSelectMode(false); setSelectedForwards([]); }
   function handleSelectForwardContact(contact: Contact) {
-    setSelectedForwardContact((prev) => prev?.phone === contact.phone ? null : contact);
+    setSelectedForwardContacts((prev) => {
+      const exists = prev.find((c) => c.phone === contact.phone);
+      if (exists) return prev.filter((c) => c.phone !== contact.phone);
+      return [...prev, contact];
+    });
   }
   function handleForwardSend() {
-    if (!selectedForwardContact) return;
-    setShowForwardPicker(false); setForwardingContent(null); setSelectedForwardContact(null); setForwardMessage("");
-    setToast(`Reenviado a ${selectedForwardContact.name} (${selectedForwards.length || 1} mensaje${(selectedForwards.length || 1) > 1 ? 's' : ''}) ✓`);
+    if (selectedForwardContacts.length === 0) return;
+    const names = selectedForwardContacts.map((c) => c.name.split(" ").slice(0, 2).join(" "));
+    const toastName = names.length === 1
+      ? names[0]
+      : `${names[0]} y ${names.length - 1} m\u00e1s`;
+    setShowForwardPicker(false); setForwardingContent(null); setSelectedForwardContacts([]); setForwardMessage("");
+    setToast(`Reenviado a ${toastName} \u2713`);
   }
 
   /* ─── Contact Sharing Flow ─── */
@@ -728,7 +736,7 @@ export default function Home() {
           };
 
           return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 20, backgroundColor: "#f2f2f7", display: "flex", flexDirection: "column" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 20, backgroundColor: "#f2f2f7", display: "flex", flexDirection: "column", maxWidth: 412, margin: "0 auto", width: "100%" }}>
             {/* Header */}
             <div style={{ backgroundColor: "#f2f2f7", paddingTop: 14, flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "0 16px 10px 16px" }}>
@@ -841,7 +849,7 @@ export default function Home() {
             return p.replace(/(\+\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4');
           }
           return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7', maxWidth: 412, margin: '0 auto', width: '100%' }}>
             {/* Header */}
             <div style={{ backgroundColor: '#f2f2f7', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <button onClick={() => { setShowContactConfirm(false); setShowContactPicker(true); }} style={{ background: 'none', border: 'none', color: '#007AFF', fontSize: 17, cursor: 'pointer', padding: 0 }}>Cancel</button>
@@ -880,7 +888,7 @@ export default function Home() {
 
         {/* ─── Contact Card Details ─── */}
         {showContactCardDetails && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#fff', maxWidth: 412, margin: '0 auto', width: '100%' }}>
             <div style={{ backgroundColor: '#075e54', color: '#fff', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <button onClick={() => setShowContactCardDetails(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontSize: 14, cursor: 'pointer', padding: 0 }}>Close</button>
               <span style={{ fontWeight: 600, fontSize: 17 }}>Shared contacts</span>
@@ -904,11 +912,11 @@ export default function Home() {
 
         {/* ─── Forward Picker ─── */}
         {showForwardPicker && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column', backgroundColor: '#f2f2f7', maxWidth: 412, margin: '0 auto', width: '100%' }}>
             {/* Header */}
             <div style={{ backgroundColor: '#f2f2f7', paddingTop: 12, paddingBottom: 0, flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 10px 16px' }}>
-                <button onClick={() => { setShowForwardPicker(false); setSelectedForwardContact(null); setForwardMessage(""); }} style={{ background: 'none', border: 'none', color: '#007AFF', fontSize: 17, cursor: 'pointer', padding: 0 }}>Cancel</button>
+                <button onClick={() => { setShowForwardPicker(false); setSelectedForwardContacts([]); setForwardMessage(""); }} style={{ background: 'none', border: 'none', color: '#007AFF', fontSize: 17, cursor: 'pointer', padding: 0 }}>Cancel</button>
                 <span style={{ fontWeight: 700, fontSize: 17, color: '#000' }}>Send to</span>
                 <button style={{ background: 'none', border: 'none', color: '#007AFF', fontSize: 15, cursor: 'pointer', padding: 0 }}>New group</button>
               </div>
@@ -937,7 +945,7 @@ export default function Home() {
                   { name: 'Isabel Cristina Delgado', phone: '51999000012', initials: 'ID', color: '#5b93d1', subtitle: '' },
                   { name: 'Valentina Sofía Paredes', phone: '51999000013', initials: 'VP', color: '#4db6ac', subtitle: '' },
                 ].filter((c) => !contactSearch || c.name.toLowerCase().includes(contactSearch.toLowerCase())).map((contact) => {
-                  const isSelected = selectedForwardContact?.phone === contact.phone;
+                  const isSelected = selectedForwardContacts.some((c) => c.phone === contact.phone);
                   return (
                     <button
                       key={contact.phone}
@@ -965,10 +973,10 @@ export default function Home() {
               <div style={{ padding: '14px 16px 6px 16px', fontSize: 13, color: '#8e8e93', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5, backgroundColor: '#f2f2f7' }}>Recent chats</div>
               <div style={{ backgroundColor: '#fff' }}>
                 {[
-                  { name: 'Rosa María Huamán', phone: '51958630718', initials: 'RH', color: '#4caf50', subtitle: 'Disponible' },
+                  { name: 'Rosa Mar\u00eda Huam\u00e1n', phone: '51958630718', initials: 'RH', color: '#4caf50', subtitle: 'Disponible' },
                   { name: 'Pagos CIX BCP', phone: '51999000020', initials: 'P', color: '#4caf50', subtitle: '' },
                 ].filter((c) => !contactSearch || c.name.toLowerCase().includes(contactSearch.toLowerCase())).map((contact) => {
-                  const isSelected = selectedForwardContact?.phone === contact.phone;
+                  const isSelected = selectedForwardContacts.some((c) => c.phone === contact.phone);
                   return (
                     <button
                       key={contact.phone}
@@ -995,8 +1003,11 @@ export default function Home() {
 
             {/* Bottom bar */}
             <div style={{ backgroundColor: '#fff', borderTop: '1px solid #e5e5ea', padding: '8px 12px', paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              {selectedForwardContact ? (
-                <span style={{ fontSize: 14, color: '#000', fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0 }}>{selectedForwardContact.name}</span>
+              {selectedForwardContacts.length > 0 ? (
+                <span style={{ fontSize: 14, color: '#000', fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 160 }}>
+                  {selectedForwardContacts[0].name.split(" ")[0]}
+                  {selectedForwardContacts.length > 1 && ` + ${selectedForwardContacts.length - 1} m\u00e1s`}
+                </span>
               ) : (
                 <span style={{ fontSize: 14, color: '#8e8e93', flexShrink: 0 }}>Select contact</span>
               )}
@@ -1011,18 +1022,18 @@ export default function Home() {
               </div>
               <button
                 onClick={handleForwardSend}
-                disabled={!selectedForwardContact}
+                disabled={selectedForwardContacts.length === 0}
                 style={{
-                  backgroundColor: selectedForwardContact ? '#34c759' : '#a8d5ba',
+                  backgroundColor: selectedForwardContacts.length > 0 ? '#34c759' : '#a8d5ba',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 18,
                   padding: '8px 20px',
                   fontSize: 15,
                   fontWeight: 600,
-                  cursor: selectedForwardContact ? 'pointer' : 'default',
+                  cursor: selectedForwardContacts.length > 0 ? 'pointer' : 'default',
                   flexShrink: 0,
-                  opacity: selectedForwardContact ? 1 : 0.6,
+                  opacity: selectedForwardContacts.length > 0 ? 1 : 0.6,
                 }}
               >
                 Forward
@@ -1033,7 +1044,7 @@ export default function Home() {
 
         {/* ─── Settings Modal ─── */}
         {showSettings && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', maxWidth: 412, margin: '0 auto', width: '100%' }}>
             <div style={{ backgroundColor: '#fff', width: '100%', borderRadius: '12px 12px 0 0', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 -4px 20px rgba(0,0,0,0.15)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #e5e5ea', flexShrink: 0 }}>
                 <h2 style={{ fontSize: 17, fontWeight: 600, color: '#111b21', margin: 0 }}>Configuracion</h2>
