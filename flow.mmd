@@ -1,0 +1,135 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2869
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fnil\fcharset0 Menlo-Bold;}
+{\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red17\green16\blue24;\red130\green53\blue188;
+\red70\green137\blue204;\red99\green159\blue215;\red194\green126\blue101;\red16\green121\blue2;}
+{\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c8627\c7843\c12157;\cssrgb\c58824\c31373\c78431;
+\cssrgb\c33725\c61176\c83922;\cssrgb\c45490\c69020\c87451;\cssrgb\c80784\c56863\c47059;\cssrgb\c0\c53333\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 ---\cb1 \
+\cb3 config:\cb1 \
+\cb3   theme: mc\cb1 \
+\cb3 ---\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf4 \cb3 \strokec4 flowchart
+\f0\b0 \cf2 \strokec2  \cf5 \strokec5 TB\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3     \cf6 \strokec6 Start\cf7 \strokec7 (["Inicio"])\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 A\cf7 \strokec7 ["Usuario inicia solicitud de cobro"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 A\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 B\cf7 \strokec7 \{"Tipo de entrada"\}\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 B\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Texto 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 C1\cf7 \strokec7 ["Recibir comando por texto"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 C1\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 D\cf7 \strokec7 ["Agente interpreta lenguaje natural"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 D\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 E\cf7 \strokec7 \{"\'bfInformaci\'f3n completa?"\}\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 E\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  No 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 F\cf7 \strokec7 ["Solicitar datos faltantes:<br>- Monto obligatorio<br>- N\'famero de personas<br>- Descripci\'f3n opcional"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 F\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 D\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 E\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  S\'ed 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 G\cf7 \strokec7 \{"\'bfDivisi\'f3n de monto?"\}\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 G\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  No 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 H\cf7 \strokec7 ["Generar solicitud simple"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 G\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Divisi\'f3n simple 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 I\cf7 \strokec7 ["Dividir entre N personas"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 G\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Divisi\'f3n personalizada 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 J\cf7 \strokec7 ["Asignar montos individuales"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 I\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 K\cf7 \strokec7 ["Calcular montos"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 J\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 K\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 H\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 L\cf7 \strokec7 ["Generar solicitud estructurada"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 K\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 L\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 L\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 M\cf7 \strokec7 ["Seleccionar modalidad de cobro"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 M\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Link de cobro 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 N\cf7 \strokec7 ["Generar link de cobro"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 N\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 O\cf7 \strokec7 ["Confirmar acci\'f3n"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 O\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Copiar 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 End\cf7 \strokec7 (["Fin"])\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 O\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Reenviar 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 P\cf7 \strokec7 ["Seleccionar el chat"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 P\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 End\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 M\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Adjuntar contactos 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 Q\cf7 \strokec7 ["Solicitar contactos"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 Q\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 R\cf7 \strokec7 \{"\'bfContactos correctos?"\}\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 R\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  Si 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 S\cf7 \strokec7 ["Enviar notificaci\'f3n al destinatario"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 R\cf2 \strokec2  
+\f1\b \cf8 \strokec8 --
+\f0\b0 \cf7 \strokec7  No 
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 T\cf7 \strokec7 ["Solicitar datos correctos"]\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 T\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 R\cf2 \cb1 \strokec2 \
+\cb3     \cf6 \strokec6 S\cf2 \strokec2  
+\f1\b \cf8 \strokec8 -->
+\f0\b0 \cf2 \strokec2  \cf6 \strokec6 End\cf2 \cb1 \strokec2 \
+\
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 Start\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 e1f5e1\cf2 \cb1 \strokec2 \
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 E\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 fff4e1\cf2 \cb1 \strokec2 \
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 G\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 fff4e1\cf2 \cb1 \strokec2 \
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 M\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 d4edff\cf2 \cb1 \strokec2 \
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 O\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 d4edff\cf2 \cb1 \strokec2 \
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 End\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 e1f5e1\cf2 \cb1 \strokec2 \
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 P\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 d4edff\cf2 \cb1 \strokec2 \
+\cb3     \cf5 \strokec5 style\cf2 \strokec2  \cf6 \strokec6 R\cf2 \strokec2  \cf6 \strokec6 fill\cf2 \strokec2 :#\cf6 \strokec6 fff4e1\cf2 \cb1 \strokec2 \
+}
